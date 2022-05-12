@@ -1,4 +1,3 @@
-import { MongoClient } from "mongodb";
 import dbConnect from "../../lib/dbConnect";
 import Meetup from "../../models/Meetup";
 
