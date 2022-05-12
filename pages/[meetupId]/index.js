@@ -1,49 +1,56 @@
 import MeetupDetail from "../../components/meetups/MeetupDetail";
+import dbConnect from "../../lib/dbConnect";
+import Meetup from "../../models/Meetup";
 
-function MeetupDetails() {
+function MeetupDetails(props) {
   return (
     <MeetupDetail
-      image="https://static.euronews.com/articles/stories/05/17/56/42/1100x619_cmsv2_dd6cf20e-a9be-50fa-beeb-a71cbd2cb9e8-5175642.jpg"
-      title="First title"
-      address="First address"
-      description="First Description"
+      image={props.meetupData.image}
+      title={props.meetupData.title}
+      address={props.meetupData.address}
+      description={props.meetupData.description}
     />
   );
 }
 
 export async function getStaticPaths() {
+  // fetch ids to create dynamic paths
+  await dbConnect();
+
+  const result = await Meetup.find({}, { _id: 1 });
+  const meetups = result.map((doc) => {
+    const meetup = doc.toObject();
+    meetup._id = meetup._id.toString();
+    return meetup;
+  });
+
   return {
     fallback: false,
-    paths: [
-      {
-        params: {
-          meetupId: "m1",
-        },
+    paths: meetups.map((meetup) => ({
+      params: {
+        meetupId: meetup._id,
       },
-      {
-        params: {
-          meetupId: "m2",
-        },
-      },
-    ],
+    })),
   };
 }
 
 export async function getStaticProps(context) {
   // fetch data for single meetup
-
   const meetupId = context.params.meetupId;
   console.log(meetupId);
+
+  await dbConnect();
+
+  const result = await Meetup.findOne({ _id: meetupId });
 
   return {
     props: {
       meetupData: {
         id: meetupId,
-        image:
-          "https://static.euronews.com/articles/stories/05/17/56/42/1100x619_cmsv2_dd6cf20e-a9be-50fa-beeb-a71cbd2cb9e8-5175642.jpg",
-        title: "First title",
-        address: "First address",
-        description: "First Description",
+        image: result.image,
+        title: result.title,
+        address: result.address,
+        description: result.description,
       },
     },
     revalidate: 10,
