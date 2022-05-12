@@ -1,9 +1,21 @@
 import MeetupList from "../components/meetups/MeetupList";
 import dbConnect from "../lib/dbConnect";
 import Meetup from "../models/Meetup";
+import Head from "next/head";
 
 function HomePage(props) {
-  return <MeetupList meetups={props.meetups} />;
+  return (
+    <>
+      <Head>
+        <title>React Meetups</title>
+        <meta
+          name="description"
+          content="Browse a huge list of highly active React meetings!"
+        />
+      </Head>
+      <MeetupList meetups={props.meetups} />
+    </>
+  );
 }
 
 // export async function getServerSideProps(context) {
